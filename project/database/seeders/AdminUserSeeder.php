@@ -1,0 +1,32 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+class AdminUserSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+
+         $adminRole = Role::where('name', 'admin')->first();
+
+        // Create the admin user
+        User::create([
+            'name' => 'said',
+            'email' => 'said@gmail.com',
+            'password' => Hash::make('12345678'),
+            'role_id' => $adminRole->id,
+            'plan_id' => 1,
+            'article_quota_remaining' => 10,
+        ]);
+    }
+}

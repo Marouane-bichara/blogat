@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: mysql_container_blogat
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: blogat
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - laravel_network
+
+  phpmyadmin:
+    container_name: phpmyadmin_container_blogat
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "8082:80"
+    networks:
+      - laravel_network
+
+  app:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: laravel_app_blogat
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - ./project:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    networks:
+      - laravel_network
+
+volumes:
+  db_data:
+
+networks:
+  laravel_network:
