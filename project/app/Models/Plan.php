@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -19,8 +18,11 @@ class Plan extends Model
         'features',
     ];
 
+    protected $casts = [
+        'features' => 'array',
+    ];
 
-      public function users()
+    public function users()
     {
         return $this->hasMany(User::class);
     }

@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Models\Role;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -15,13 +14,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
-use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationLabel = 'Users';
 
     public static function form(Forms\Form $form): Forms\Form
     {
@@ -74,13 +74,42 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')->searchable(),
                 TextColumn::make('email')->searchable(),
-                TextColumn::make('role.name')->label('Role'),
-                TextColumn::make('provider')->badge(),
-                TextColumn::make('article_quota_remaining')->label('Quota Remaining'),
-                TextColumn::make('subscription_expires_at')->label('Subscription Expiry')->dateTime(),
+
+                BadgeColumn::make('role.name')
+                    ->label('Role')
+                    ->colors([
+                        'success' => fn ($state) => $state === 'admin',
+                        'info' => fn ($state) => $state === 'user',
+                    ]),
+
+                BadgeColumn::make('provider')
+                    ->colors([
+                        'primary' => 'local',
+                        'success' => 'google',
+                    ]),
+
+                TextColumn::make('article_quota_remaining')
+                    ->label('Quota Remaining'),
+
+                TextColumn::make('subscription_expires_at')
+                    ->label('Subscription Expiry')
+                    ->dateTime(),
+
+                TextColumn::make('plan.name')
+                    ->label('Plan')
+                    ->sortable(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('role_id')
+                    ->relationship('role', 'name')
+                    ->label('Role'),
+
+                Tables\Filters\SelectFilter::make('provider')
+                    ->options([
+                        'local' => 'Local',
+                        'google' => 'Google',
+                    ])
+                    ->label('Provider'),
             ])
             ->actions([
                 EditAction::make(),
@@ -93,9 +122,7 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
