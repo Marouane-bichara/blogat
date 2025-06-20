@@ -22,7 +22,7 @@ class AiLog extends Model
         'tokens_used',
     ];
 
-
+  
      public function user()
     {
         return $this->belongsTo(User::class);
